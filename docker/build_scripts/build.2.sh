@@ -26,7 +26,7 @@ MANYLINUX1_DEPS="glibc-devel libstdc++-devel glib2-devel libX11-devel libXext-de
 # sed -i 's/#\(baseurl.*\)mirror.centos.org\/centos\/$releasever/\1vault.centos.org\/5.11/' /etc/yum.repos.d/*.repo
 yum install centos-release-scl -y
 yum install devtoolset-7 -y
-# scl enable devtoolset-7 bash
+scl enable devtoolset-7 bash
 # Get build utilities
 source $MY_DIR/build_utils.sh
 
@@ -79,16 +79,12 @@ yum -y install \
     unzip \
     which \
     yasm \
-    openssl \
-    curl \
-    openssl-devel \
-    curl-devel \
     ${PYTHON_COMPILE_DEPS}
 
 # Build an OpenSSL for both curl and the Pythons. We'll delete this at the end.
 build_openssl $OPENSSL_ROOT $OPENSSL_HASH
 
-# # Install curl so we can have TLS 1.2 in this ancient container.
+# Install curl so we can have TLS 1.2 in this ancient container.
 build_curl $CURL_ROOT $CURL_HASH
 hash -r
 curl --version
@@ -111,7 +107,7 @@ build_libtool $LIBTOOL_ROOT $LIBTOOL_HASH
 libtool --version
 
 # Install a more recent SQLite3
-curl -kfsSLO $SQLITE_AUTOCONF_DOWNLOAD_URL/$SQLITE_AUTOCONF_VERSION.tar.gz
+curl -fsSLO $SQLITE_AUTOCONF_DOWNLOAD_URL/$SQLITE_AUTOCONF_VERSION.tar.gz
 check_sha256sum $SQLITE_AUTOCONF_VERSION.tar.gz $SQLITE_AUTOCONF_HASH
 tar xfz $SQLITE_AUTOCONF_VERSION.tar.gz
 cd $SQLITE_AUTOCONF_VERSION
@@ -155,15 +151,15 @@ ln -s $PY36_BIN/auditwheel /usr/local/bin/auditwheel
 
 # Clean up development headers and other unnecessary stuff for
 # final image
-yum -y erase \
-    avahi \
-    bitstream-vera-fonts \
-    freetype \
-    gtk2 \
-    hicolor-icon-theme \
-    libX11 \
-    wireless-tools #\
-#    ${PYTHON_COMPILE_DEPS}  # > /dev/null 2>&1
+# yum -y erase \
+#     avahi \
+#     bitstream-vera-fonts \
+#     freetype \
+#     gtk2 \
+#     hicolor-icon-theme \
+#     libX11 \
+#     wireless-tools \
+#     ${PYTHON_COMPILE_DEPS}  # > /dev/null 2>&1
 yum -y install ${MANYLINUX1_DEPS}
 yum -y clean all # /dev/null 2>&1
 yum list installed
@@ -193,13 +189,3 @@ done
 
 # Fix libc headers to remain compatible with C99 compilers.
 find /usr/include/ -type f -exec sed -i 's/\bextern _*inline_*\b/extern __inline __attribute__ ((__gnu_inline__))/g' {} +
-
-git clone https://github.com/protocolbuffers/protobuf.git
-cd protobuf
-git submodule update --init --recursive
-./autogen.sh
-./configure
-make
-make check
-make install
-ldconfig

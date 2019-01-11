@@ -1,0 +1,7 @@
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US.UTF-8"
+export LANGUAGE="en_US.UTF-8"
+export PATH="/opt/rh/devtoolset-7/root/usr/bin:$PATH"
+export LD_LIBRARY_PATH="/opt/rh/devtoolset-7/root/usr/lib64:/opt/rh/devtoolset-7/root/usr/lib:/usr/local/lib64:/usr/local/lib:/usr/lib:/usr/lib64"
+export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
+export SSL_CERT_FILE="/opt/_internal/certs.pem"

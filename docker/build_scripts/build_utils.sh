@@ -45,7 +45,7 @@ function do_cpython_build {
     local prefix="/opt/_internal/cpython-${py_ver}${dir_suffix}"
     mkdir -p ${prefix}/lib
     ./configure --prefix=${prefix} --disable-shared $unicode_flags > /dev/null
-    make -j2 > /dev/null
+    make -j4 > /dev/null
     make install > /dev/null
     popd
     rm -rf Python-$py_ver
@@ -74,8 +74,8 @@ function build_cpython {
     check_var $py_ver
     check_var $PYTHON_DOWNLOAD_URL
     local py_dist_dir=$(pyver_dist_dir $py_ver)
-    curl -fsSLO $PYTHON_DOWNLOAD_URL/$py_dist_dir/Python-$py_ver.tgz
-    curl -fsSLO $PYTHON_DOWNLOAD_URL/$py_dist_dir/Python-$py_ver.tgz.asc
+    curl -kfsSLO $PYTHON_DOWNLOAD_URL/$py_dist_dir/Python-$py_ver.tgz
+    curl -kfsSLO $PYTHON_DOWNLOAD_URL/$py_dist_dir/Python-$py_ver.tgz.asc
     gpg --verify Python-$py_ver.tgz.asc
     if [ $(lex_pyver $py_ver) -lt $(lex_pyver 3.3) ]; then
         do_cpython_build $py_ver ucs2
@@ -90,7 +90,7 @@ function build_cpython {
 
 function build_cpythons {
     check_var $GET_PIP_URL
-    curl -fsSLO $GET_PIP_URL
+    curl -kfsSLO $GET_PIP_URL
     # Import public keys used to verify downloaded Python source tarballs.
     # https://www.python.org/static/files/pubkeys.txt
     gpg --import ${MY_DIR}/cpython-pubkeys.txt
@@ -130,7 +130,7 @@ function fetch_source {
     if [ -f ${file} ]; then
         echo "${file} exists, skipping fetch"
     else
-        curl -fsSL -o ${file} ${url}/${file}
+        curl -kfsSL -o ${file} ${url}/${file}
     fi
 }
 
@@ -200,9 +200,9 @@ function build_curl {
 
 
 function do_standard_install {
-    ./configure > /dev/null
-    make > /dev/null
-    make install > /dev/null
+    ./configure # > /dev/null
+    make # > /dev/null
+    make install # > /dev/null
 }
 
 
